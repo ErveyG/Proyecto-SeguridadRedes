@@ -24,7 +24,7 @@ with open("users.txt", "r") as user_file:
 # Función para cifrar datos
 def encrypt(data):
     cipher = hashlib.sha256(shared_key.encode()).digest()
-    encrypted_data = ''.join([chr(ord(data[i]) + ord(cipher[i % len(cipher)])) for i in range(len(data))])
+    encrypted_data = ''.join([chr((ord(data[i]) + ord(cipher[i % len(cipher)])) % 256) for i in range(len(data)])
     return encrypted_data
 
 # Función para descifrar datos

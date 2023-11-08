@@ -11,8 +11,7 @@ shared_key = 'my_shared_key'
 # Función para cifrar datos
 def encrypt(data):
     cipher = hashlib.sha256(shared_key.encode()).digest()
-    cipher_str = ''.join([chr(byte) for byte in cipher])
-    encrypted_data = ''.join([chr(ord(data[i]) + ord(cipher_str[i % len(cipher_str)])) for i in range(len(data))])
+    encrypted_data = ''.join([chr((ord(data[i]) + ord(cipher[i % len(cipher)])) % 256) for i in range(len(data)])
     return encrypted_data
 
 # Función para descifrar datos
