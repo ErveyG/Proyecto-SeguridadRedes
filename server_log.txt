@@ -1,0 +1,7 @@
+2023-11-08 14:02:46: Servidor ATM en ejecución...
+2023-11-08 14:02:58: Conexión entrante de ('127.0.0.1', 51687)
+2023-11-08 14:03:05: Consulta de saldo para la cuenta 123456. Saldo actual: $1500.0
+2023-11-08 14:03:22: Transferencia de $500.0 de la cuenta 123456 a la cuenta 789012. Nuevo saldo del remitente: $1000.0. Nuevo saldo del destinatario: $1500.0
+2023-11-08 14:03:24: Consulta de saldo para la cuenta 123456. Saldo actual: $1000.0
+2023-11-08 14:03:28: Conexión entrante de ('127.0.0.1', 51689)
+2023-11-08 14:03:41: Consulta de saldo para la cuenta 789012. Saldo actual: $1500.0

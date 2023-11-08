@@ -1,9 +1,19 @@
 import socket
 import threading
+import datetime
 
 # Configuración del servidor
 host = '127.0.0.1'
 port = 12345
+
+# Nombre del archivo de registro
+log_file = 'server_log.txt'
+
+# Función para escribir un registro en el archivo de registro con fecha y hora
+def log_event(event):
+    with open(log_file, 'a') as log:
+        timestamp = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+        log.write(f"{timestamp}: {event}\n")
 
 # Cargando datos de usuarios desde un archivo de texto (simplificado)
 users = {}
@@ -11,6 +21,8 @@ with open('users.txt', 'r') as file:
     for line in file:
         account_number, pin, balance = line.strip().split(',')
         users[account_number] = (pin, float(balance))
+
+# Resto del código del servidor...
 
 # Función para manejar la conexión con un cliente
 def handle_client(client_socket):
@@ -65,7 +77,10 @@ def authenticate_user(account_number, pin):
 # Función para obtener el saldo de un usuario
 def get_balance(account_number):
     if account_number in users:
-        return users[account_number][1]
+        balance = users[account_number][1]
+        log_event(f"Consulta de saldo para la cuenta {account_number}. Saldo actual: ${balance}")
+        return balance
+    log_event(f"Intento de consulta de saldo para una cuenta inexistente: {account_number}")
     return 0
 
 # Función para realizar un retiro
@@ -76,7 +91,11 @@ def withdraw(account_number, amount):
             new_balance = current_balance - amount
             users[account_number] = (users[account_number][0], new_balance)
             update_user_data()
+            log_event(f"Retiro de ${amount} realizado en la cuenta {account_number}. Nuevo saldo: ${new_balance}")
             return True, new_balance
+        log_event(f"Intento de retiro de ${amount} en la cuenta {account_number} sin fondos suficientes.")
+    else:
+        log_event(f"Intento de retiro en una cuenta inexistente: {account_number}")
     return False, 0
 
 # Función para realizar un depósito
@@ -86,7 +105,10 @@ def deposit(account_number, amount):
         new_balance = current_balance + amount
         users[account_number] = (users[account_number][0], new_balance)
         update_user_data()
+        log_event(f"Depósito de ${amount} realizado en la cuenta {account_number}. Nuevo saldo: ${new_balance}")
         return new_balance
+    log_event(f"Intento de depósito en una cuenta inexistente: {account_number}")
+    return 0
 
 # Función para manejar las transferencias entre cuentas
 def transfer(sender_account_number, receiver_account_number, amount):
@@ -99,8 +121,14 @@ def transfer(sender_account_number, receiver_account_number, amount):
             users[sender_account_number] = (users[sender_account_number][0], sender_new_balance)
             users[receiver_account_number] = (users[receiver_account_number][0], receiver_new_balance)
             update_user_data()
+            log_event(f"Transferencia de ${amount} de la cuenta {sender_account_number} a la cuenta {receiver_account_number}. Nuevo saldo del remitente: ${sender_new_balance}. Nuevo saldo del destinatario: ${receiver_new_balance}")
             return True, sender_new_balance
+        else:
+            log_event(f"Intento de transferencia de ${amount} de la cuenta {sender_account_number} a la cuenta {receiver_account_number} sin fondos suficientes.")
+    else:
+        log_event("Intento de transferencia entre cuentas inexistentes.")
     return False, 0
+
 
 # Función para actualizar los datos de usuario en el archivo de texto
 def update_user_data():
@@ -113,11 +141,11 @@ server_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 server_socket.bind((host, port))
 server_socket.listen(5)
 
-print("Servidor ATM en ejecución...")
+log_event("Servidor ATM en ejecución...")
 
 while True:
     client_socket, client_address = server_socket.accept()
-    print(f"Conexión entrante de {client_address}")
+    log_event(f"Conexión entrante de {client_address}")
 
     # Iniciar un hilo para manejar al cliente
     client_thread = threading.Thread(target=handle_client, args=(client_socket,))
