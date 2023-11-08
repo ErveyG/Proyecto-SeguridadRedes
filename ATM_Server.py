@@ -30,7 +30,7 @@ def encrypt(data):
 # Función para descifrar datos
 def decrypt(data):
     cipher = hashlib.sha256(shared_key.encode()).digest()
-    decrypted_data = ''.join([chr(ord(data[i]) - ord(cipher[i % len(cipher)])) for i in range(len(data))])
+    decrypted_data = ''.join([chr((ord(data[i]) - ord(cipher[i % len(cipher)])) % 256) for i in range(len(data))])
     return decrypted_data
 
 # Función para escribir registros en el archivo de registro
