@@ -23,12 +23,15 @@ def main():
                     logged_in = True
                 else:
                     print(response)
+                    print("----------\n")
             else:
                 print("Opciones:")
                 print("1. Consultar saldo")
                 print("2. Retirar dinero")
                 print("3. Depositar dinero")
-                print("4. Salir")
+                print("4. Transferir dinero")
+                print("5. Salir")
+                print("----------\n")
 
                 choice = input("Seleccione una opción: ")
 
@@ -36,21 +39,32 @@ def main():
                     client_socket.send(f"balance {account_number}".encode('utf-8'))
                     response = client_socket.recv(1024).decode('utf-8')
                     print(response)
+                    print("----------\n")
                 elif choice == "2":
                     amount = float(input("Ingrese la cantidad a retirar: "))
                     client_socket.send(f"withdraw {account_number} {amount}".encode('utf-8'))
                     response = client_socket.recv(1024).decode('utf-8')
                     print(response)
+                    print("----------\n")
                 elif choice == "3":
                     amount = float(input("Ingrese la cantidad a depositar: "))
                     client_socket.send(f"deposit {account_number} {amount}".encode('utf-8'))
                     response = client_socket.recv(1024).decode('utf-8')
                     print(response)
+                    print("----------\n")
                 elif choice == "4":
+                    receiver_account_number = input("Ingrese el número de cuenta de destino: ")
+                    amount = float(input("Ingrese la cantidad a transferir: "))
+                    client_socket.send(f"transfer {account_number} {receiver_account_number} {amount}".encode('utf-8'))
+                    response = client_socket.recv(1024).decode('utf-8')
+                    print(response)
+                    print("----------\n")
+                elif choice == "5":
                     client_socket.send("exit".encode('utf-8'))
                     break
                 else:
                     print("Opción no válida")
+                    print("----------\n")
 
     finally:
         client_socket.close()

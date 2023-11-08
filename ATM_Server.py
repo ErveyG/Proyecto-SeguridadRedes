@@ -43,6 +43,13 @@ def handle_client(client_socket):
                 account_number, amount = data.split()[1], float(data.split()[2])
                 new_balance = deposit(account_number, amount)
                 client_socket.send(f"Depósito exitoso. Nuevo saldo: ${new_balance}".encode('utf-8'))
+            elif data.startswith("transfer"):
+                sender_account_number, receiver_account_number, amount = data.split()[1], data.split()[2], float(data.split()[3])
+                success, new_balance = transfer(sender_account_number, receiver_account_number, amount)
+                if success:
+                    client_socket.send(f"Transferencia exitosa. Nuevo saldo: ${new_balance}".encode('utf-8'))
+                else:
+                    client_socket.send("Transferencia fallida. Fondos insuficientes o cuenta inexistente.".encode('utf-8'))
             else:
                 client_socket.send("Comando no válido.".encode('utf-8'))
 
@@ -80,6 +87,20 @@ def deposit(account_number, amount):
         users[account_number] = (users[account_number][0], new_balance)
         update_user_data()
         return new_balance
+
+# Función para manejar las transferencias entre cuentas
+def transfer(sender_account_number, receiver_account_number, amount):
+    if sender_account_number in users and receiver_account_number in users:
+        sender_balance = users[sender_account_number][1]
+        if sender_balance >= amount:
+            receiver_balance = users[receiver_account_number][1]
+            sender_new_balance = sender_balance - amount
+            receiver_new_balance = receiver_balance + amount
+            users[sender_account_number] = (users[sender_account_number][0], sender_new_balance)
+            users[receiver_account_number] = (users[receiver_account_number][0], receiver_new_balance)
+            update_user_data()
+            return True, sender_new_balance
+    return False, 0
 
 # Función para actualizar los datos de usuario en el archivo de texto
 def update_user_data():
