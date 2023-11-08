@@ -1,23 +1,8 @@
 import socket
-import hashlib
 
 # Configuración del cliente
 host = '127.0.0.1'
 port = 12345
-
-# Clave compartida para cifrado (debe coincidir con la del servidor)
-shared_key = 'my_shared_key'
-
-# Función para cifrar datos
-def encrypt(data):
-    return data
-
-
-# Función para descifrar datos
-def decrypt(data):
-    cipher = hashlib.sha256(shared_key.encode()).digest()
-    decrypted_data = ''.join([chr(ord(data[i]) - ord(cipher[i % len(cipher)])) for i in range(len(data))])
-    return decrypted_data
 
 # Función para interactuar con el cliente
 def main():
@@ -39,8 +24,9 @@ def main():
                 if choice == "1":
                     account_number = input("Ingrese el número de cuenta: ")
                     pin = input("Ingrese su PIN: ")
-                    client_socket.send(encrypt(f"login {account_number} {pin}"))
-                    response = decrypt(client_socket.recv(1024).decode('utf-8'))
+                    data = f"login {account_number} {pin}"
+                    client_socket.send(data.encode('utf-8'))  # Codificar y enviar
+                    response = client_socket.recv(1024).decode('utf-8')
                     print(response)
                     print("------------------\n")
                     if response == "Login exitoso.":
@@ -71,31 +57,36 @@ def main():
             choice = input("Seleccione una opción: ")
 
             if choice == "1":
-                client_socket.send(encrypt(f"balance {account_number}"))
-                response = decrypt(client_socket.recv(1024).decode('utf-8'))
+                data = f"balance {account_number}"
+                client_socket.send(data.encode('utf-8'))  # Codificar y enviar
+                response = client_socket.recv(1024).decode('utf-8')
                 print(response)
                 print("------------------\n")
             elif choice == "2":
                 amount = float(input("Ingrese la cantidad a retirar: "))
-                client_socket.send(encrypt(f"withdraw {account_number} {amount}"))
-                response = decrypt(client_socket.recv(1024).decode('utf-8'))
+                data = f"withdraw {account_number} {amount}"
+                client_socket.send(data.encode('utf-8'))  # Codificar y enviar
+                response = client_socket.recv(1024).decode('utf-8')
                 print(response)
                 print("------------------\n")
             elif choice == "3":
                 amount = float(input("Ingrese la cantidad a depositar: "))
-                client_socket.send(encrypt(f"deposit {account_number} {amount}"))
-                response = decrypt(client_socket.recv(1024).decode('utf-8'))
+                data = f"deposit {account_number} {amount}"
+                client_socket.send(data.encode('utf-8'))  # Codificar y enviar
+                response = client_socket.recv(1024).decode('utf-8')
                 print(response)
                 print("------------------\n")
             elif choice == "4":
                 receiver_account = input("Ingrese el número de cuenta de destino: ")
                 amount = float(input("Ingrese la cantidad a transferir: "))
-                client_socket.send(encrypt(f"transfer {account_number} {receiver_account} {amount}"))
-                response = decrypt(client_socket.recv(1024).decode('utf-8'))
+                data = f"transfer {account_number} {receiver_account} {amount}"
+                client_socket.send(data.encode('utf-8'))  # Codificar y enviar
+                response = client_socket.recv(1024).decode('utf-8')
                 print(response)
                 print("------------------\n")
             elif choice == "5":
-                client_socket.send(encrypt("exit"))
+                data = "exit"
+                client_socket.send(data.encode('utf-8'))  # Codificar y enviar
                 break
             else:
                 print("Opción no válida")
